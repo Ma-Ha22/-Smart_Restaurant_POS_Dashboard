@@ -1,0 +1,17 @@
+.max-search-height {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .max-ingredients-width {
+      max-width: 320px;
+    }
+    .active-row {
+      background-color: #0dcaf0 !important;
+      color: #000 !important;
+    }
+    .active-row span, .active-row small {
+      color: #000 !important;
+    }
+    .transition-colors {
+      transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+    }

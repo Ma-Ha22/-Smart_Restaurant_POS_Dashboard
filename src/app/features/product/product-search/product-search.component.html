@@ -1,0 +1,85 @@
+<div class="card bg-dark text-white border-secondary shadow-lg">
+    <div class="card-header border-secondary py-3">
+        <h5 class="card-title mb-0 text-info">
+            <i class="bi bi-search me-2"></i> البحث المتقدم في قائمة الطعام
+        </h5>
+        <small class="text-muted">نظام مرن ومقاوم للـ Race Conditions مع معالجة الكيبورد</small>
+    </div>
+    <div class="card-body">
+        <!-- 1. شريط البحث والفلترة -->
+        <div class="row g-2 mb-3">
+            <div class="col-md-8 position-relative">
+                <input #searchInput type="text" class="form-control bg-black text-white border-secondary"
+                    placeholder="ابحث بالاسم، المكونات، الكود..." (input)="onSearch($event)"
+                    (keydown)="handleKeyboardNavigation($event)" autocomplete="off" />
+                <!-- مؤشر تحميل صغير يظهر فقط أثناء عمل الـ API -->
+                <div *ngIf="isLoading()" class="position-absolute top-50 end-0 translate-middle-y me-3">
+                    <div class="spinner-border spinner-border-sm text-info" role="status"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select (change)="onCategoryChange($event)" class="form-select bg-black text-white border-secondary">
+                    <option value="ALL">جميع الأقسام</option>
+                    <option value="burgers">البرجر والسندوتشات</option>
+                    <option value="sides">المقبلات والجانبيات</option>
+                    <option value="drinks">المشروبات المنعشة</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="list-group bg-black rounded border border-secondary max-search-height">
+                    <!-- في حال لم يكتب المستخدم شيئاً أو لم تظهر نتائج -->
+                    <div *ngIf="results().length === 0" class="text-center py-4 text-muted small">
+                        اكتب للبحث عن وجبة أو صنف معين...
+                    </div>
+
+                    <!-- عرض كروت المنتجات مع دعم إضاءة الحروف المتطابقة وتتبع التحديد النشط -->
+                    <button *ngFor="let product of results(); let i = index" type="button"
+                        [class.active-row]="i === activeRowIndex()" (click)="selectProduct(product)"
+                        [disabled]="!product.isAvailable"
+                        class="list-group-item list-group-item-action bg-dark text-white border-secondary d-flex justify-content-between align-items-center py-2 px-3 transition-colors">
+
+                        <div class="text-start">
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- إضاءة الحروف المتطابقة باستخدام الـ innerHTML والدالة المساعدة -->
+                                <span class="fw-bold" [innerHTML]="highlightMatch(product.name)"></span>
+                                <span class="badge bg-secondary font-monospace" style="font-size: 8px;">{{ product.id
+                                    }}</span>
+                                <span *ngIf="!product.isAvailable" class="badge bg-danger" style="font-size: 8px;">غير
+                                    متوفر</span>
+                            </div>
+                            <small class="text-muted d-block text-truncate max-ingredients-width"
+                                [innerHTML]="highlightMatch(product.ingredients)"></small>
+                        </div>
+
+                        <span class="text-info fw-bold font-monospace">{{ product.price | currency:'USD' }}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div
+                    class="p-3 bg-black rounded border border-secondary h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h6 class="text-muted text-uppercase tracking-wider small mb-2">عمليات البحث الأخيرة</h6>
+                        <div class="d-flex flex-wrap gap-1">
+                            <span *ngIf="recentSearches().length === 0" class="text-muted small">لا توجد عمليات
+                                سابقة.</span>
+                            <button *ngFor="let term of recentSearches()" (click)="applyRecentSearch(term)"
+                                class="btn btn-sm btn-outline-secondary rounded-pill py-0.5 px-2"
+                                style="font-size: 11px;">
+                                {{ term }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-top border-secondary text-muted" style="font-size: 10px;">
+                        استخدم <kbd class="bg-secondary text-white px-1">↑</kbd> <kbd
+                            class="bg-secondary text-white px-1">↓</kbd> للتنقل، و <kbd
+                            class="bg-secondary text-white px-1">Enter</kbd> للاختيار
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
